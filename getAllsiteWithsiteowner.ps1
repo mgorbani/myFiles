@@ -29,7 +29,6 @@ Function global:Get-SPSite($url)
     return New-Object Microsoft.SharePoint.SPSite($url)
  }
 }
-
 Function global:Get-SPWeb($url)
 {
   $site= Get-SPSite($url)
@@ -43,11 +42,9 @@ Function global:Get-SPWeb($url)
 
 Function GetUserAccessReport($WebAppURL, $SearchUser)
 {
-
  #Get All Site Collections of the WebApp
  $SiteCollections = Get-SPWebApplication($WebAppURL)
  $SiteCollections= $SiteCollections.Sites
-
 
  #Write CSV- TAB Separated File) Header
  "URL `t Site Template `t Title `t PermissionType `t Permissions `t UserName"  | out-file UserAccessReport.csv
@@ -70,7 +67,6 @@ Function GetUserAccessReport($WebAppURL, $SearchUser)
 
  #Check Web Application Policies
  $WebApp= Get-SPWebApplication $WebAppURL
-
  foreach ($Policy in $WebApp.Policies)
   {
    #Check if the search users is member of the group
@@ -83,11 +79,9 @@ Function GetUserAccessReport($WebAppURL, $SearchUser)
           $PolicyRoles+= $Role.Name +";"
         }
       #Write-Host "Permissions: " $PolicyRoles
-
       "$($WebAppURL) `t Web Application `t $($AdminSite.Title)`t  Web Application Policy `t $($PolicyRoles)" | Out-File UserAccessReport.csv -Append
     }
   }
-
 
   #Loop through all site collections
    foreach($Site in $SiteCollections){
@@ -102,24 +96,17 @@ Function GetUserAccessReport($WebAppURL, $SearchUser)
 
     #Loop throuh all Sub Sites
     foreach($Web in $Site.AllWebs)
-    {
-      #write-host "hej" $web.Url
-     # GetUserAccessReport "http://w2k8-wss3sp2" "w2k8-wss3sp2\user1"
+    {     
      getUsersfromweb $Web ""
-
     } # all web
    }
 
   }
   function getUsersfromweb($Web, $user){
-   
     if($Web.HasUniqueRoleAssignments -eq $True){
-
-      foreach($WebRoleAssignment in $Web.RoleAssignments ){   
-
+      foreach($WebRoleAssignment in $Web.RoleAssignments ){ 
         foreach($usr in $WebRoleAssignment.Member.Users){
-          #Write-Host " hej" $usr
-         # if($WebRoleAssignment.Member.Name -match "owner"){
+          
           if($usr.isSiteAdmin){
             "$($Web.Url) `t web `t $($Web.Title  ) `t Uniq Assignment `t  $($WebRoleAssignment.Member) `t $($usr) " | Out-File UserAccessReport.csv -Append
           }
@@ -134,7 +121,7 @@ Function GetUserAccessReport($WebAppURL, $SearchUser)
         foreach($usr in $WebRoleAssignment.Member.Users){
           Write-Host " hej" $usr.isSiteAdmin
           write-host "owner: " $Web.owner.Name
-        #  if($WebRoleAssignment.Member.Name -match "owner"){
+       
           if($usr.isSiteAdmin){
             "$($Web.Url) `t web `t $($Web.Title  ) `t Direct Permission `t $($WebRoleAssignment.Member) `t $($usr) " | Out-File UserAccessReport.csv -Append
           }
